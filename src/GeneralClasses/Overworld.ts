@@ -14,7 +14,7 @@ export class Overworld {
     this.element = config.element;
     this.canvas = this.element.querySelector('.game-canvas');
     this.ctx = this.canvas.getContext('2d');
-    this.map = new OverworldMap({ ...OverWorldMaps.DemoRoom });
+    this.map = null;
   }
 
   public startGameLoop() {
@@ -38,7 +38,7 @@ export class Overworld {
   }
 
   public init() {
-    this.map = new OverworldMap({ ...OverWorldMaps.DemoRoom });
+    this.map = new OverworldMap({ ...OverWorldMaps.Kitchen });
     this.startGameLoop();
   }
 }
