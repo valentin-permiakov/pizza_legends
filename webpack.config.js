@@ -31,24 +31,28 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(png|svg|jpg|jpeg|gif|woff2|woff|mp3)$/i,
-                type: 'asset/resource',
+                test: /\.(png|svg|jpg|jpeg|gif|ico|woff2|woff|mp3)$/i,
+                type: 'asset/resource'
             },
         ],
     },
     resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+        },
         extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, './src/index.html'),
+            favicon: './src/favicon.ico'
         }),
         new MiniCssExtractPlugin({
             filename: 'style.[contenthash].css',
         })
     ],
     output: {
-        publicPath: IS_DEV ? '/' : './',
+        publicPath: IS_DEV ? './' : './',
         filename: 'index[contenthash].js',
         clean: true,
     },

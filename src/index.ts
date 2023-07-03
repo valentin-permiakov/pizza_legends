@@ -1,4 +1,4 @@
-import { Overworld } from './Overworld';
+import { Overworld } from './GeneralClasses/Overworld';
 import './styles/style.css';
 
 const overworld = new Overworld({
