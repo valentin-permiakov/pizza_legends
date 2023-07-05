@@ -1,3 +1,4 @@
+import { Person } from '@/Characters/Person';
 import { GameObject } from './GameObject';
 import heroSrc from '@/img/characters/people/hero.png';
 import npc1Src from '@/img/characters/people/npc1.png';
@@ -5,6 +6,7 @@ import testRoomSrcLower from '@/img/maps/DemoLower.png';
 import testRoomSrcUpper from '@/img/maps/DemoUpper.png';
 import kitchetSrcLower from '@/img/maps/KitchenLower.png';
 import kitchetSrcUpper from '@/img/maps/KitchenUpper.png';
+import { utils } from '@/utils/utils';
 
 type TGameObjects = {
   [key: string]: GameObject;
@@ -54,14 +56,16 @@ export const OverWorldMaps: IOverWorldMaps = {
     lowerSrc: testRoomSrcLower,
     upperSrc: testRoomSrcUpper,
     gameObjects: {
-      hero: new GameObject({
+      hero: new Person({
         src: heroSrc,
-        x: 5,
-        y: 6,
+        x: utils.withGrid(5),
+        y: utils.withGrid(6),
+        direction: 'down',
+        isPlayerControlled: true,
       }),
-      npc1: new GameObject({
-        x: 7,
-        y: 9,
+      npc1: new Person({
+        x: utils.withGrid(7),
+        y: utils.withGrid(9),
         src: npc1Src,
       }),
     },
@@ -72,12 +76,12 @@ export const OverWorldMaps: IOverWorldMaps = {
     gameObjects: {
       hero: new GameObject({
         src: heroSrc,
-        x: 7,
-        y: 9,
+        x: utils.withGrid(7),
+        y: utils.withGrid(9),
       }),
       npc1: new GameObject({
-        x: 3,
-        y: 5,
+        x: utils.withGrid(3),
+        y: utils.withGrid(5),
         src: npc1Src,
       }),
     },

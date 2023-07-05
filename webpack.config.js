@@ -52,7 +52,7 @@ module.exports = {
         })
     ],
     output: {
-        publicPath: IS_DEV ? '/' : './',
+        // publicPath: IS_DEV ? '/' : './',
         filename: 'index[contenthash].js',
         clean: true,
     },
