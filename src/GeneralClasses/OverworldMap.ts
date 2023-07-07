@@ -67,6 +67,7 @@ export const OverWorldMaps: IOverWorldMaps = {
         x: utils.withGrid(7),
         y: utils.withGrid(9),
         src: npc1Src,
+        direction: 'up',
       }),
     },
   },

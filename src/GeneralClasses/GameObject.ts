@@ -1,5 +1,5 @@
 import { TDirection } from '@/Controls/DirectionInput';
-import { Sprite } from './Sprite';
+import { IAnimations, Sprite } from './Sprite';
 
 export interface IGameObjectConfig {
   x: number;
@@ -26,11 +26,11 @@ export class GameObject {
     this.sprite = new Sprite({
       gameObject: this,
       src: config.src,
-      currentAnimation: '',
+      currentAnimation: ('idle-' + this.direction) as keyof IAnimations,
       currentAnimationFrame: 0,
-      animations: {
-        idleDown: [[0, 0]],
-      },
+      // animations: {
+      //   'idle-down': [[0, 0]],
+      // },
       useShadow: true,
     });
   }
