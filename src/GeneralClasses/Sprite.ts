@@ -1,3 +1,4 @@
+import { utils } from '@/utils/utils';
 import { GameObject } from './GameObject';
 import shadowSrc from '@/img/characters/shadow.png';
 
@@ -69,7 +70,7 @@ export class Sprite {
     };
     this.currentAnimation = config.currentAnimation || 'idle-down';
     this.currentAnimationFrame = config.currentAnimationFrame || 0;
-    this.animationFrameLimit = config.animationFrameLimit || 16;
+    this.animationFrameLimit = config.animationFrameLimit || 4;
     this.animationFrameProgress = this.animationFrameLimit;
 
     // setup image
@@ -122,9 +123,9 @@ export class Sprite {
     }
   }
 
-  public draw(ctx: CanvasRenderingContext2D) {
-    const x = this.gameObject.x - 8;
-    const y = this.gameObject.y - 18;
+  public draw(ctx: CanvasRenderingContext2D, cameraPerson: GameObject) {
+    const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
+    const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
 
     const [frameX, frameY] = this.frame;
 
