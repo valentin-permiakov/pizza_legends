@@ -3,14 +3,21 @@ import { IAnimations, Sprite } from './Sprite';
 import { OverworldMap } from './OverworldMap';
 import { OverworldEvent } from './OverworldEvent';
 
-export type BehaviorType = 'walk' | 'stand';
+export type BehaviorType = 'walk' | 'stand' | 'textMessage' | 'changeMap';
 
 export interface IBehavior {
   type: BehaviorType;
-  direction: TDirection;
+  direction?: TDirection;
   time?: number;
   who?: string;
   retry?: boolean;
+  text?: string;
+  faceHero?: string;
+  map?: string;
+}
+
+export interface ITalkingEvents {
+  events: Array<IBehavior>;
 }
 
 export interface IGameObjectConfig {
@@ -20,6 +27,7 @@ export interface IGameObjectConfig {
   direction?: TDirection;
   isPlayerControlled?: boolean;
   behaviorLoop?: IBehavior[];
+  talking?: ITalkingEvents[];
 }
 
 export interface IGameObjectUpdate {
@@ -36,6 +44,8 @@ export class GameObject {
   direction: TDirection;
   behaviorLoop: IBehavior[];
   behaviorLoopIndex: number;
+  isStanding: boolean;
+  talking: ITalkingEvents[];
 
   constructor(config: IGameObjectConfig) {
     this.id = null;
@@ -52,6 +62,7 @@ export class GameObject {
     });
     this.behaviorLoop = config.behaviorLoop || [];
     this.behaviorLoopIndex = 0;
+    this.talking = config.talking || [];
   }
 
   public mount(map: OverworldMap) {
@@ -68,7 +79,11 @@ export class GameObject {
 
   public async doBehaviorEvent(map: OverworldMap) {
     // Don't do anything if there's a cutscene in progress or no behavior to have
-    if (map.isCutscenePlaying || this.behaviorLoop.length === 0) {
+    if (
+      map.isCutscenePlaying ||
+      this.behaviorLoop.length === 0 ||
+      this.isStanding
+    ) {
       return;
     }
 

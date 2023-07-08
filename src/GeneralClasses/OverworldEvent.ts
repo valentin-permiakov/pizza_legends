@@ -1,5 +1,9 @@
+import { TextMessage } from '@/Messages/TextMessage';
 import { IBehavior } from './GameObject';
 import { OverworldMap } from './OverworldMap';
+import { utils } from '@/utils/utils';
+import { OverWorldMaps } from '@/overworldMaps';
+import { SceneTransition } from './SceneTransition';
 
 export interface IOverworldEventConfig {
   map: OverworldMap;
@@ -14,8 +18,8 @@ export class OverworldEvent {
     this.event = event;
   }
 
-  public stand(resolve: (value: unknown) => void) {
-    const who = this.map.gameObjects[this.event.who];
+  private stand(resolve: (value: unknown) => void) {
+    const who = this.map.gameObjects[this.event.who || 'hero'];
     who.startBehavior(
       {
         map: this.map,
@@ -37,8 +41,8 @@ export class OverworldEvent {
     document.addEventListener('PersonStandingComplete', completeHandler);
   }
 
-  public walk(resolve: (value: PromiseLike<null>) => void) {
-    const who = this.map.gameObjects[this.event.who];
+  private walk(resolve: (value: PromiseLike<null>) => void) {
+    const who = this.map.gameObjects[this.event.who || 'hero'];
     who.startBehavior(
       {
         map: this.map,
@@ -58,6 +62,35 @@ export class OverworldEvent {
       }
     };
     document.addEventListener('PersonWalkingComplete', completeHandler);
+  }
+
+  private textMessage(resolve: (value: PromiseLike<null>) => void) {
+    if (this.event.faceHero) {
+      const obj = this.map.gameObjects[this.event.faceHero];
+
+      obj.direction = utils.oppositeDirection(
+        this.map.gameObjects['hero'].direction
+      );
+    }
+
+    const message = new TextMessage({
+      text: this.event.text || '',
+      onComplete: () => resolve(null),
+    });
+    message.init(document.getElementById('game-container'));
+  }
+
+  private changeMap(resolve: (value: PromiseLike<null>) => void) {
+    const sceneTransition = new SceneTransition();
+    sceneTransition.init(document.getElementById('game-container'), () => {
+      if (OverWorldMaps[this.event.map]) {
+        this.map.overworld.startMap({ ...OverWorldMaps[this.event.map] });
+      } else {
+        this.map.overworld.startMap({ ...OverWorldMaps.DemoRoom });
+      }
+      resolve(null);
+      sceneTransition.fadeOut();
+    });
   }
 
   public init() {

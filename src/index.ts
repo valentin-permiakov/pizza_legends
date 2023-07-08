@@ -1,5 +1,5 @@
 import { Overworld } from './GeneralClasses/Overworld';
-import './styles/style.css';
+import './styles/global.css';
 // import './favicon.ico';
 
 const overworld = new Overworld({

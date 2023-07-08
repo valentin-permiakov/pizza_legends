@@ -1,3 +1,16 @@
+@import './TextMessage.css';
+@import './SceneTransition.css';
+
+:root {
+    --border-color: #291D4D;
+    --dialog-bg: #fff3b4;
+
+    --menu-bg: #ffe8d2;
+    --menu-border-color: #a48465;
+    --menu-font-color: #3a160d;
+    --menu-selected-bg: #7fc2ff;
+}
+
 * {
     box-sizing: border-box;
 }

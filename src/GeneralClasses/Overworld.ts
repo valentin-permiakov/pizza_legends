@@ -1,6 +1,8 @@
 import { DirectionInput } from '@/Controls/DirectionInput';
-import { OverworldMap, OverWorldMaps } from './OverworldMap';
+import { IOverworldMapConfig, OverworldMap } from './OverworldMap';
 import { IOverworldEventConfig } from './OverworldEvent';
+import { KeyPressListener } from './KeyPressListener';
+import { OverWorldMaps } from '@/overworldMaps';
 
 export interface IOverworldConfig {
   element: HTMLElement;
@@ -17,7 +19,7 @@ export class Overworld {
     this.element = config.element;
     this.canvas = this.element.querySelector('.game-canvas');
     this.ctx = this.canvas.getContext('2d');
-    this.map = new OverworldMap({ ...OverWorldMaps.DemoRoom });
+    this.map = null;
     this.directionInput = null;
   }
 
@@ -80,21 +82,40 @@ export class Overworld {
     requestAnimationFrame(stepFn);
   }
 
-  public init() {
-    this.map = new OverworldMap({ ...OverWorldMaps.DemoRoom });
+  private bindActionInput() {
+    new KeyPressListener('Enter', () => {
+      // Is there a person here to talk to?
+
+      this.map.checkForActionCutscene();
+    });
+  }
+
+  private bindHeroPositionCheck() {
+    document.addEventListener('PersonWalkingComplete', (e: CustomEvent) => {
+      if (e.detail.whoId === 'hero') {
+        // Hero's position has changed
+        this.map.checkForFootstepCutscene();
+      }
+    });
+  }
+
+  public startMap(mapConfig: IOverworldMapConfig) {
+    this.map = new OverworldMap(mapConfig);
+    this.map.overworld = this;
     this.map.mountObjects();
+  }
+
+  public init() {
+    this.startMap({ ...OverWorldMaps.Kitchen });
+
+    this.bindActionInput();
+    this.bindHeroPositionCheck();
 
     this.directionInput = new DirectionInput();
     this.directionInput.init();
 
     this.startGameLoop();
 
-    this.map.startCutscene([
-      { who: 'hero', type: 'walk', direction: 'down' },
-      { who: 'hero', type: 'walk', direction: 'down' },
-      { who: 'npcA', type: 'walk', direction: 'left' },
-      { who: 'npcA', type: 'walk', direction: 'left' },
-      { who: 'npcA', type: 'stand', direction: 'up', time: 800 },
-    ]);
+    // this.map.startCutscene([{ type: 'changeMap', map: 'DemoRoom' }]);
   }
 }

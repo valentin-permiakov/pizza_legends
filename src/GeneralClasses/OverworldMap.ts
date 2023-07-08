@@ -1,31 +1,34 @@
-import { Person } from '@/Characters/Person';
-import { GameObject, IBehavior } from './GameObject';
-import heroSrc from '@/img/characters/people/hero.png';
-import npc1Src from '@/img/characters/people/npc1.png';
-import npc2Src from '@/img/characters/people/npc2.png';
-import testRoomSrcLower from '@/img/maps/DemoLower.png';
-import testRoomSrcUpper from '@/img/maps/DemoUpper.png';
-import kitchetSrcLower from '@/img/maps/KitchenLower.png';
-import kitchetSrcUpper from '@/img/maps/KitchenUpper.png';
 import { utils } from '@/utils/utils';
+import { GameObject, IBehavior } from './GameObject';
 import { OverworldEvent } from './OverworldEvent';
+import { Overworld } from './Overworld';
 
-type TGameObjects = {
+export type TGameObjects = {
   [key: string]: GameObject;
 };
-type TGameWalls = {
+
+export type TGameWalls = {
   [key: string]: boolean;
 };
 
 interface ICutsceneEvent extends IBehavior {
-  who: string;
+  who?: string;
 }
+
+export type TGameCutsceneEvents = {
+  events: Array<IBehavior>;
+};
+
+export type TGameCutsceneSpaces = {
+  [key: string]: TGameCutsceneEvents[];
+};
 
 export interface IOverworldMapConfig {
   lowerSrc: string;
   upperSrc: string;
   gameObjects: TGameObjects;
   walls?: TGameWalls;
+  cutsceneSpaces?: TGameCutsceneSpaces;
 }
 
 export class OverworldMap {
@@ -33,12 +36,17 @@ export class OverworldMap {
   lowerImage: HTMLImageElement;
   upperImage: HTMLImageElement;
   walls: TGameWalls;
+  cutsceneSpaces: TGameCutsceneSpaces;
   isCutscenePlaying: boolean;
   isPaused: boolean;
+  overworld: Overworld;
 
   constructor(config: IOverworldMapConfig) {
+    this.overworld = null;
     this.gameObjects = config.gameObjects;
     this.walls = config.walls || {};
+    this.cutsceneSpaces = config.cutsceneSpaces || {};
+
     // images
     this.lowerImage = new Image();
     this.lowerImage.src = config.lowerSrc;
@@ -89,10 +97,42 @@ export class OverworldMap {
         map: this,
         event: events[i],
       });
+      // await each one
       await event.init();
     }
-    // await each one
     this.isCutscenePlaying = false;
+
+    // Reset NPCs to do their idle behavior
+    Object.values(this.gameObjects).forEach((object) =>
+      object.doBehaviorEvent(this)
+    );
+  }
+
+  // Cutscene checks
+
+  // Check if next to a person we can talk to
+  public checkForActionCutscene() {
+    const hero = this.gameObjects['hero'];
+    const nextCoords = utils.nextPosition(hero.x, hero.y, hero.direction);
+
+    const match = Object.values(this.gameObjects).find(
+      (object) =>
+        `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
+    );
+
+    if (!this.isCutscenePlaying && match && match.talking.length) {
+      this.startCutscene(match.talking[0].events);
+    }
+  }
+
+  // Check if finished walking and is in an action space
+  public checkForFootstepCutscene() {
+    const hero = this.gameObjects['hero'];
+    const match = this.cutsceneSpaces[`${hero.x},${hero.y}`];
+
+    if (!this.isCutscenePlaying && match) {
+      this.startCutscene(match[0].events);
+    }
   }
 
   // Handling physical boundaries of objects
@@ -108,88 +148,3 @@ export class OverworldMap {
     this.addWall(x, y);
   }
 }
-
-interface IOverWorldMaps {
-  [key: string]: {
-    lowerSrc: string;
-    upperSrc: string;
-    gameObjects: TGameObjects;
-    walls: TGameWalls;
-  };
-}
-
-export const OverWorldMaps: IOverWorldMaps = {
-  DemoRoom: {
-    lowerSrc: testRoomSrcLower,
-    upperSrc: testRoomSrcUpper,
-    gameObjects: {
-      hero: new Person({
-        src: heroSrc,
-        x: utils.withGrid(5),
-        y: utils.withGrid(6),
-        direction: 'down',
-        isPlayerControlled: true,
-      }),
-      npcA: new Person({
-        x: utils.withGrid(7),
-        y: utils.withGrid(9),
-        src: npc1Src,
-        direction: 'down',
-        behaviorLoop: [
-          { type: 'stand', direction: 'up', time: 800 },
-          { type: 'stand', direction: 'right', time: 600 },
-          { type: 'stand', direction: 'down', time: 1200 },
-          { type: 'stand', direction: 'left', time: 1500 },
-        ],
-      }),
-      npcB: new Person({
-        x: utils.withGrid(3),
-        y: utils.withGrid(7),
-        src: npc2Src,
-        direction: 'left',
-        behaviorLoop: [
-          { type: 'walk', direction: 'left' },
-          { type: 'stand', direction: 'up', time: 800 },
-          { type: 'walk', direction: 'up' },
-          { type: 'walk', direction: 'right' },
-          { type: 'walk', direction: 'down' },
-        ],
-      }),
-    },
-    walls: {
-      [utils.asGridCoord(7, 2)]: true,
-      [utils.asGridCoord(1, 3)]: true,
-      [utils.asGridCoord(2, 3)]: true,
-      [utils.asGridCoord(3, 3)]: true,
-      [utils.asGridCoord(4, 3)]: true,
-      [utils.asGridCoord(5, 3)]: true,
-      [utils.asGridCoord(6, 3)]: true,
-      [utils.asGridCoord(8, 3)]: true,
-      [utils.asGridCoord(9, 3)]: true,
-      [utils.asGridCoord(10, 3)]: true,
-      [utils.asGridCoord(6, 4)]: true,
-      [utils.asGridCoord(8, 4)]: true,
-      [utils.asGridCoord(7, 6)]: true,
-      [utils.asGridCoord(8, 6)]: true,
-      [utils.asGridCoord(7, 7)]: true,
-      [utils.asGridCoord(8, 7)]: true,
-    },
-  },
-  Kitchen: {
-    lowerSrc: kitchetSrcLower,
-    upperSrc: kitchetSrcUpper,
-    gameObjects: {
-      hero: new GameObject({
-        src: heroSrc,
-        x: utils.withGrid(7),
-        y: utils.withGrid(9),
-      }),
-      npc1: new GameObject({
-        x: utils.withGrid(3),
-        y: utils.withGrid(5),
-        src: npc1Src,
-      }),
-    },
-    walls: {},
-  },
-};

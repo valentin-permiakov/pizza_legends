@@ -1,3 +1,6 @@
+import { TDirection } from '@/Controls/DirectionInput';
+import { GameObject } from '@/GeneralClasses/GameObject';
+
 export const utils = {
   withGrid(n: number) {
     return n * 16;
@@ -29,6 +32,19 @@ export const utils = {
     }
 
     return { x, y };
+  },
+
+  oppositeDirection(direction: TDirection): TDirection {
+    switch (direction) {
+      case 'left':
+        return 'right';
+      case 'right':
+        return 'left';
+      case 'up':
+        return 'down';
+      case 'down':
+        return 'up';
+    }
   },
 
   emitEvent(
