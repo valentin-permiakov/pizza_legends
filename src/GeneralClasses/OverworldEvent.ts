@@ -4,6 +4,7 @@ import { OverworldMap } from './OverworldMap';
 import { utils } from '@/utils/utils';
 import { OverWorldMaps } from '@/overworldMaps';
 import { SceneTransition } from './SceneTransition';
+import { Battle } from '@/Battle/Battle';
 
 export interface IOverworldEventConfig {
   map: OverworldMap;
@@ -91,6 +92,13 @@ export class OverworldEvent {
       resolve(null);
       sceneTransition.fadeOut();
     });
+  }
+
+  private battle(resolve: (value: PromiseLike<null>) => void) {
+    const battle = new Battle({
+      onComplete: () => resolve(null),
+    });
+    battle.init(document.getElementById('game-container'));
   }
 
   public init() {

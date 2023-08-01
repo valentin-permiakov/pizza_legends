@@ -3,7 +3,12 @@ import { IAnimations, Sprite } from './Sprite';
 import { OverworldMap } from './OverworldMap';
 import { OverworldEvent } from './OverworldEvent';
 
-export type BehaviorType = 'walk' | 'stand' | 'textMessage' | 'changeMap';
+export type BehaviorType =
+  | 'walk'
+  | 'stand'
+  | 'textMessage'
+  | 'changeMap'
+  | 'battle';
 
 export interface IBehavior {
   type: BehaviorType;

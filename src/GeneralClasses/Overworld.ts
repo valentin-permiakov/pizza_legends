@@ -116,6 +116,6 @@ export class Overworld {
 
     this.startGameLoop();
 
-    // this.map.startCutscene([{ type: 'changeMap', map: 'DemoRoom' }]);
+    this.map.startCutscene([{ type: 'battle' }]);
   }
 }

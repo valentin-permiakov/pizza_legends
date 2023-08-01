@@ -13,6 +13,7 @@ import {
   TGameWalls,
 } from './GeneralClasses/OverworldMap';
 import { utils } from './utils/utils';
+
 interface IOverWorldMaps {
   [key: string]: {
     lowerSrc: string;

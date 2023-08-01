@@ -1,5 +1,10 @@
 @import './TextMessage.css';
 @import './SceneTransition.css';
+@import './Battle.css';
+@import './Team.css';
+@import './Combatant.css';
+@import './SubmissionMenu.css';
+
 
 :root {
     --border-color: #291D4D;
